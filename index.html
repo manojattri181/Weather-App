@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather</title>
+</head>
+<style>
+    *{
+        color: white;
+    }
+    h3{
+        color: white;
+        padding: 20px;
+        background-color: rgb(29, 148, 148);
+        position: absolute;
+        /* top: -1px; */
+        margin-top: -20px;
+        margin-left: 60px;
+        z-index: 3;
+        border-radius: 30px 100px 30px 100px;
+    }
+    #box{
+        position: relative;
+        width: 80%;
+        padding: 10px;
+        display: flex;
+        overflow:hidden;
+        margin: auto;
+        margin-top: 100px;
+    }
+    
+    #container{
+        width: 600px;
+        text-align: center;
+        margin: auto;
+        margin-top: 100px;
+    }
+    #container div{
+        display: flex;
+    }
+    .mapouter{
+        text-align: left;
+        padding-left: 10px;
+        overflow: hidden;
+        height:500px;
+        width:1000px;
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+    }
+    .gmap_canvas {
+        height:500px;
+        width:900px;
+        float: left;
+        /* background:none!important; */
+    }
+    
+    #display{
+        padding: 10px;
+        /* border: 1px solid black; */
+        box-shadow: rgba(50, 50, 93, 0.25) 0px 50px 100px -20px, rgba(0, 0, 0, 0.3) 0px 30px 60px -30px;
+        background-color: rgb(142, 196, 218);
+}
+
+#search{
+        margin-top: 30px;
+        display: flex;
+        float: right;
+        margin-right: 10px;
+    }
+    input{
+        border: none;
+        padding: 10px;
+        margin-left: 80px;
+        color: black;
+        border-radius: 10px;
+    }
+    button{
+        padding: 12px;
+        border: none;
+        background-color: rgb(184, 42, 42);
+        font-size: 16px;
+        border-radius: 10px;
+        margin-left: -30px;
+        cursor: pointer;
+    }
+    #temp{
+        width: 100%;
+        height: 100px;
+        display: flex;
+        background-image: url(https://images.unsplash.com/photo-1510784722466-f2aa9c52fff6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8c3VucmlzZXxlbnwwfHwwfHw%3D&auto=format&fit=crop&w=500&q=60);
+        background-size: 95%;
+        opacity: 0.9;
+        margin: auto;
+        background-repeat: no-repeat;
+        color: teal;
+        padding: 20px;
+    }
+    #temp div{
+     margin-right: 20px;
+     display: flex;
+     flex-direction: column;
+    }
+    p{ 
+        text-align: left;
+        font-size: 18px;
+        margin-top: -18px;
+    }
+    h6+p{
+        margin-top: -26px;
+    }
+    #air{
+        display: flex;
+        box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    }
+    #air div{
+        width: 150px;
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+    }
+    h5{
+        text-align: left;
+    }
+</style>
+<body>
+       <h3>WEATHER</h3>
+    <div id="box">
+        <div id="display">
+            <div id="search">
+                <input type="text"  id="city" placeholder="Search for Location">
+                <button onclick="getdata()">Search</button>
+            </div>
+
+            <div id="container">
+                <!-- //append data of city -->
+            </div>
+        </div>
+        
+            <div id="map">
+                <div class="mapouter"><div class="gmap_canvas"><iframe width="600" height="500" id="gmap_canvas" src="https://maps.google.com/maps?q=delhi&t=&z=11&ie=UTF8&iwloc=&output=embed" frameborder="0" scrolling="no" marginheight="0" marginwidth="0"></iframe>
+                    </div></div>
+            </div>
+        
+    </div>
+    
+</body>
+</html>
+<script>
+    // api fetching 
+    
+    function getdata(){
+
+        async function data(){
+            try{
+                let city =  document.querySelector("#city").value;
+                let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=dfba0c71d5f637d9f1fe5ca7c37a746e`);
+
+                // let res = await fetch(`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=dfba0c71d5f637d9f1fe5ca7c37a746e`);
+                let data = await res.json();
+                append(data);
+            }
+            catch(err){
+                console.log(err);
+            }
+        }
+  
+  data();
+
+
+
+// appending data
+function append(data){
+    console.log(data);
+    document.querySelector("#container").innerHTML = null;
+
+    let name =  data.name;
+    let main = data.main;
+    let temp =  Math.round(Number(main.temp)-273)*100/100;
+    let sys = data.sys;
+    let weather = data.weather;
+    let desc  =weather[0].main;
+
+      document.querySelector("#container").innerHTML = 
+         `  <h1>${name}</h1>
+                <div id="temp">
+                    <div>
+                        <h5>CURRENT WEATHER</h5>
+                        <p>in ${name} </p> 
+                    </div>
+                    
+                    <div>
+                          <h2>${temp} C</h2>
+                          <div>
+                               <p>${desc}</p>  
+                                <p>Feels Like <span>${temp} C</span></p>
+                            </div>
+                     </div>
+                </div>
+                <h5>The Skies will be mostly clear . The Low will Be ${Math.round((Number(main.temp_min)-273)*100)/100} C</h5>
+                <div id="air">
+                  <div>
+                      <h5>VISIBILITY</h5>
+                       <p>${Number(data.visibility)/1000} km</p>
+                  </div>
+                  <div>
+                      <h5>SEA LEVEL</h5>
+                       <p>${main.sea_level}</p>
+                  </div>
+                  <div>
+                      <h5>HUMIDITY</h5>
+                       <p>${main.humidity}</p>
+                  </div>
+                  <div>
+                      <h5>WIND</h5>
+                       <p>${data.wind.speed} Km/h</p>
+                  </div>
+                  <div>
+                      <h5>PRESSURE</h5>
+                       <p>${main.pressure} mb</p>
+                  </div>
+
+                </div>` ;
+
+     let iframe =  document.querySelector("#gmap_canvas");
+     iframe.src=`https://maps.google.com/maps?q=${data.name}&t=&z=11&ie=UTF8&iwloc=&output=embed`;
+
+}
+}
+
+function getLocationWeather() {
+  navigator.geolocation.getCurrentPosition(success);
+  function success(position) {
+    const latitude = position.coords.latitude;
+    const longitude = position.coords.longitude;
+    console.log(latitude);
+    console.log(longitude);
+    // data(latitude,longitude);
+  }
+}
+ getLocationWeather();
+
+</script>
